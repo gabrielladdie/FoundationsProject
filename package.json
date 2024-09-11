@@ -1,0 +1,22 @@
+{
+  "name": "foundationsproject",
+  "version": "1.0.0",
+  "description": "A ticketing reimbursement system.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielladdie/FoundationsProject.git"
+  },
+  "author": "Gabriell Y.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gabrielladdie/FoundationsProject/issues"
+  },
+  "homepage": "https://github.com/gabrielladdie/FoundationsProject#readme",
+  "dependencies": {
+    "winston": "^3.14.2"
+  }
+}
