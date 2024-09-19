@@ -1,4 +1,5 @@
 const managerDAO = require('./managerDAO');
+const uuid = require('uuid');
 
 async function viewAllTickets() {
     const tickets = await managerDAO.viewAllTickets();
@@ -11,4 +12,10 @@ async function updateTicket(ticketID, status) {
 
 async function filterByStatus(status) {
     return await managerDAO.filterByStatus(status);
+};
+
+module.exports = {
+    viewAllTickets,
+    updateTicket,
+    filterByStatus
 };

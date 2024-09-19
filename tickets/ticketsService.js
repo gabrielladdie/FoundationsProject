@@ -15,3 +15,9 @@ async function createTicket(ticket) {
 async function getTicketByID(ID) {
     const ticket = await ticketsDAO.getTicketByID(ID);
 }
+
+module.export = {
+    getAllTickets,
+    createTicket,
+    getTicketByID
+}

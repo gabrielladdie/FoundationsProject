@@ -58,5 +58,6 @@ async function getTicketByID(ID){
 
 module.exports = {
     getAllTickets, 
-    createTicket
+    createTicket,
+    getTicketByID
 };

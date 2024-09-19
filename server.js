@@ -1,36 +1,19 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+const logger = require('./logger');
 
-let body = '';
+const port = 3000;
 
-// Middleware
-app.use(express.json()); // for parsing application/json
+app.use(express.json());
 
-// Router definitions
-router.get('/', (req, res) => {
-    req.on('data', (chunk) => {
-        body += chunk;
-    });
-    res.send('Hello World!');
-});
+app.use((req, res, next) => {
+    logger.info(`${req.method}: ${req.url} request received`);
+    next();
+})
 
-router.post('/tickets', (req, res) => {
-    res.send('Ticket created!');
-});
+app.use('/tickets', router);
 
-router.get('/tickets', (req, res) => {
-    res.send('List of tickets');
-});
-
-// Use the router
-app.use('/', router);
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
-
-
-module.exports = router;
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+})
