@@ -2,11 +2,16 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 
+let body = '';
+
 // Middleware
 app.use(express.json()); // for parsing application/json
 
 // Router definitions
 router.get('/', (req, res) => {
+    req.on('data', (chunk) => {
+        body += chunk;
+    });
     res.send('Hello World!');
 });
 

@@ -1,19 +1,17 @@
-const {getAllTickets, createTicket} = require('./ticketsDAO');
+const ticketsDAO = require('./ticketsDAO');
+const uuid = require('uuid');
 
-async function getTickets(req, res) {
-    try {
-        const tickets = await getAllTickets();
-        res.status(200).json(tickets);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
+async function getAllTickets() {
+    const tickets = await ticketsDAO.getAllTickets();
 }
 
-async function createTicketService(req, res) {
-    try {
-        const ticket = await createTicket(req.body);
-        res.status(200).json(ticket);
-    } catch (error) {
-        res.status(500).json({error: error.message});
-    }
+async function createTicket(ticket) {
+    const ticket = await ticketsDAO.createTicket({
+        ...ticket,
+        ticketID: uuid.v4()
+    });
+}
+
+async function getTicketByID(ID) {
+    const ticket = await ticketsDAO.getTicketByID(ID);
 }
