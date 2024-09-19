@@ -59,3 +59,9 @@ async function filterByStatus(status){
     }
 
 }
+
+module.exports = {
+    viewAllTickets,
+    updateTicket,
+    filterByStatus
+};

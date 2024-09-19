@@ -35,3 +35,8 @@ async function createTicket(ticket){
         console.log(error);
     }
 }
+
+module.exports = {
+    getAllTickets, 
+    createTicket
+};
