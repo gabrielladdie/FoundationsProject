@@ -1,22 +1,31 @@
 const express = require('express');
-const app = express(); //creates express application
+const app = express(); // Creates express application
 const ticketRouter = require('./tickets/ticketsController'); 
-const employeeRouter = require('./tickets/ticketsController');// creates router for handling routes
+const employeeRouter = require('./employee/employeeController'); // Make sure you have a separate controller for employees
 const logger = require('./logger');
 
-const port = 3000;
+const port =  3000; // Use environment variable for port
 
-app.use(express.json()); // tells the app to understand JSON data in requests
+app.use(express.json()); // Tells the app to understand JSON data in requests
 
-// middleware setup to log information about EACH request
-app.use((req, res, next) => { // res not used because middleware is only logging information about incoming requests; its not modifying or sending any response
-    logger.info(`${req.method}: ${req.url} request received`); // logs method AND URL of each req
-    next(); // IMPORTANT: passes control to next middleware; allows the server to move on to any subsequent middleware/route handlers
-})
+// Middleware setup to log information about each request
+app.use((req, res, next) => {
+    logger.info(`${req.method}: ${req.url} request received`); // Logs method and URL of each request
+    next(); // Pass control to the next middleware
+});
 
+// Define routes
 app.use('/employees', employeeRouter);
-app.use('/tickets', ticketRouter); // use router for paths starting with /tickets
+app.use('/tickets', ticketRouter); // Use router for paths starting with /tickets
 
+
+// Centralized error handling middleware
+app.use((err, req, res, next) => {
+    logger.error(err.stack);
+    res.status(500).json({ message: 'Internal Server Error' });
+});
+
+// Start the server
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
-})
+});

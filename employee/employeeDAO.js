@@ -1,33 +1,32 @@
-const {DynamoDBClient} = require("@aws-sdk/client-dynamodb");
-const {DynamoDBDocumentClient, 
-    ScanCommand,
-    PutCommand
-    } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand, PutCommand, GetCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
 
-const client = new DynamoDBClient({region: 'us-east-1'});
+const client = new DynamoDBClient({ region: 'us-east-1' });
 const documentClient = DynamoDBDocumentClient.from(client);
+const bcrypt = require('bcrypt');
 
+const TABLE_TICKETS = 'Tickets';
+const TABLE_EMPLOYEES = 'Employees';
 
-// get tickets for employee
-async function viewAllTickets(){
+// Get all tickets
+async function viewAllTickets() {
     const command = new ScanCommand({
-        TableName: 'Tickets'
+        TableName: TABLE_TICKETS
     });
     try {
         const response = await documentClient.send(command);
-        console.log(response);
+        return response.Items;  // Return items instead of logging
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching tickets:", error);
+        throw error;  // Rethrow the error
     }
 }
 
-// update ticket
-async function updateTicket(ticketID, status){
+// Update ticket status
+async function updateTicket(ticketID, status) {
     const command = new PutCommand({
-        TableName: 'Tickets',
-        Key: {
-            ticketID: ticketID
-        },
+        TableName: TABLE_TICKETS,
+        Key: { ticketID },
         UpdateExpression: "set status = :status",
         ExpressionAttributeValues: {
             ":status": status
@@ -36,33 +35,36 @@ async function updateTicket(ticketID, status){
     });
     try {
         const response = await documentClient.send(command);
-        console.log(response);
+        return response.Attributes;  // Return updated attributes
     } catch (error) {
-        console.log(error);
+        console.error("Error updating ticket:", error);
+        throw error;
     }
 }
 
-// filter by status
-async function filterByStatus(status){
-    const command = new GetCommand({
-        TableName: 'Tickets',
-        Key: {
-            status: status
+// Get tickets by status
+async function getTicketsByStatus(status) {
+    const command = new QueryCommand({
+        TableName: TABLE_TICKETS,
+        KeyConditionExpression: "status = :status",
+        ExpressionAttributeValues: {
+            ":status": status
         }
     });
     try {
         const response = await documentClient.send(command);
-        console.log(response);
+        return response.Items;  // Return items instead of logging
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching tickets by status:", error);
+        throw error;
     }
 }
 
-// get tickets for employee
-async function viewEmployeeTickets(){
+// Get tickets for a specific employee
+async function viewEmployeeTickets(email) {
     const command = new QueryCommand({
-        TableName,
-        KeyConditionExpression: "email = :email",
+        TableName: TABLE_TICKETS,
+        KeyConditionExpression: "#email = :email",
         ExpressionAttributeNames: {
             "#email": "email"
         },
@@ -72,28 +74,68 @@ async function viewEmployeeTickets(){
     });
     try {
         const response = await documentClient.send(command);
-        console.log(response);
+        return response.Items;  // Return items instead of logging
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching employee tickets:", error);
+        throw error;
     }
 }
 
-async function postTicket(ticket){
+// Post a new ticket
+async function postTicket(item) {
     const command = new PutCommand({
-        TableName: 'Tickets',
-        Item
+        TableName: TABLE_TICKETS,
+        Item: item
     });
     try {
-        const response = await documentClient.send(command);
-        console.log(response);
+        await documentClient.send(command);
     } catch (error) {
-        console.log(error);
+        console.error("Error posting ticket:", error);
+        throw error;
     }
 }
+
+// Post a new user
+async function postUser(employee) {
+    const hashedPassword = await bcrypt.hash(employee.password, 10); // Hash the password
+    const command = new PutCommand({
+        TableName: TABLE_EMPLOYEES,
+        Item: {
+            email: employee.email,
+            password: hashedPassword, // Store the hashed password
+        }
+    });
+
+    try {
+        await documentClient.send(command);
+    } catch (error) {
+        console.error("Error creating employee:", error);
+        throw error;
+    }
+}
+
+// Get employee details
+async function getEmployee(email) {
+    const command = new GetCommand({
+        TableName: TABLE_EMPLOYEES,
+        Key: { email }
+    });
+
+    try {
+        const response = await documentClient.send(command);
+        return response.Item;  // Return the item
+    } catch (error) {
+        console.error("Error getting employee:", error);
+        throw error;
+    }
+}
+
 module.exports = {
     viewAllTickets,
     updateTicket,
-    filterByStatus,
+    getTicketsByStatus,
     viewEmployeeTickets,
-    postTicket
+    postTicket,
+    postUser,
+    getEmployee
 };

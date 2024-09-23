@@ -1,32 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
 
 const employeeService = require('./employeeService');
 
 // route to handle POST requests
-router.post("/", validateUserMiddleware, (req, res) => {
+router.post("/register", async (req, res) => {
     const jsonData = req.body;
-    console.log(jsonData);
-    res.status(201).json({message: "Data Received"});
-});
 
-function validateUserMiddleware(req, res, next){
-    // Check if there is a valid username and password
-    let jsonBody = req.body;
-    if(validateItem(jsonBody)){
-        next();
+    const result = await employeeService.registerUser(jsonData);
+    if(result.success){
+        res.status(201).json({
+            message: "User registered successfully"
+        });
     }else{
         res.status(400).json({
-            message: "Invalid Username or Password"
-        })
+            message: result.message
+        });
     }
-}
+});
 
-function validateItem(data){
-    // Check if there is a valid username and password
-    if(data.username && data.password){
-        return data.username && data.password;
-    }
-}
+
 
 module.exports = router;
