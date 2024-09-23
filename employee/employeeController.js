@@ -6,14 +6,14 @@ const employeeService = require('./employeeService');
 
 // route to handle POST requests
 router.post("/register", async (req, res) => {
-    const jsonData = req.body;
-    const result = await employeeService.registerUser(jsonData);
+    const user = req.body;
+    const result = await employeeService.registerUser(user);
 
-    if(result.success){
+    if (result.success) {
         res.status(201).json({
             message: "User registered successfully"
         });
-    }else{
+    } else {
         res.status(400).json({
             message: result.message
         });
@@ -23,15 +23,16 @@ router.post("/register", async (req, res) => {
 
 // Route to handle user login
 router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+    const {email, Password} = req.body;
+    const result = await employeeService.loginUser(req, email, Password);
 
-    const result = await employeeService.loginUser(email, password);
     if (result.success) {
         res.status(200).json({ message: result.message });
     } else {
         res.status(400).json({ message: result.message });
     }
 });
+
 
 // Route to handle logout
 router.post("/logout", (req, res) => {

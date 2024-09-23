@@ -31,13 +31,14 @@ async function filterByStatus(status) {
 
 async function registerUser(user) {
     const validation = validateUser(user);
+
     if (validation.isValid) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const hashedPassword = await bcrypt.hash(user.Password, 10);
         try {
             await employeeDAO.postUser({
                 ...user,
-                password: hashedPassword,
-                employeeID: uuid.v4()
+                Password: hashedPassword,
+                Position: user.Position
             });
             return { success: true };
         } catch (error) {
@@ -49,29 +50,24 @@ async function registerUser(user) {
     }
 }
 
-async function loginUser(email, password) {
+async function loginUser(req, email, Password) {
     try {
         // Fetch the user details from the database
         const employee = await employeeDAO.getEmployee(email);
+        console.log(email, Password);
+        console.log(employee);
+        console.log(await bcrypt.compare(Password, employee.Password))
 
-        if (!employee) {
+
+        if (!employee || !(await bcrypt.compare(Password, employee.Password))) {
             return { success: false, message: "User not found" };
         }
 
-        // Compare the provided password with the hashed password
-        const isPasswordValid = await bcrypt.compare(password, employee.password);
 
-        if (!isPasswordValid) {
-            return { success: false, message: "Invalid password" };
-        }
-
-        // Store user info in session
-        session.user = {
-            email: employee.email,
-            employeeID: employee.employeeID
-        };
-
-        return { success: true, message: "Login successful" };
+            req.session.user = employee.email;
+            return {
+                success: true, message: "Login successful"
+            };
 
     } catch (error) {
         console.error("Error during login:", error);
@@ -79,11 +75,12 @@ async function loginUser(email, password) {
     }
 }
 
+
 function validateUser(user) {
     const errors = [];
 
-    if (!user.username) errors.push("Username is required");
-    if (!user.password) errors.push("Password is required");
+    if (!user.email) errors.push("Username is required");
+    if (!user.Password) errors.push("Password is required");
 
     return {
         isValid: errors.length === 0,

@@ -97,12 +97,13 @@ async function postTicket(item) {
 
 // Post a new user
 async function postUser(employee) {
-    const hashedPassword = await bcrypt.hash(employee.password, 10); // Hash the password
+    const hashedPassword = await bcrypt.hash(employee.Password, 10); // Hash the password
     const command = new PutCommand({
         TableName: TABLE_EMPLOYEES,
         Item: {
             email: employee.email,
-            password: hashedPassword, // Store the hashed password
+            Password: hashedPassword, // Store the hashed password
+            Position: employee.Position
         }
     });
 
@@ -119,16 +120,13 @@ async function postUser(employee) {
 async function getEmployee(email) {
     const command = new GetCommand({
         TableName: TABLE_EMPLOYEES,
-        Key: { email }
+        Key: { 
+            email// employee used to fetch employee
+        }
     });
 
-    try {
-        const response = await documentClient.send(command);
-        return response.Item;  // Return the item
-    } catch (error) {
-        console.error("Error getting employee:", error);
-        throw error;
-    }
+    const data = await documentClient.send(command);
+    return data.Item || null;
 }
 
 module.exports = {
