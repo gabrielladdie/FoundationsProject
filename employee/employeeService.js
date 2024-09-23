@@ -62,8 +62,6 @@ async function loginUser(req, email, Password) {
         if (!employee || !(await bcrypt.compare(Password, employee.Password))) {
             return { success: false, message: "User not found" };
         }
-
-
             req.session.user = employee.email;
             return {
                 success: true, message: "Login successful"

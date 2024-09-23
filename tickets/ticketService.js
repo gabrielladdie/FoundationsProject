@@ -43,54 +43,24 @@ async function getTicketByID(ID) {
 }
 
 async function getPendingTickets() {
-    const command = new QueryCommand({
-        TableName: 'Tickets',
-        IndexName: 'StatusIndex', // Ensure you have a GSI for status if needed
-        KeyConditionExpression: "#status = :pending",
-        ExpressionAttributeNames: {
-            "#status": "status"
-        },
-        ExpressionAttributeValues: {
-            ":pending": "Pending"
-        }
-    });
-
     try {
-        const response = await documentClient.send(command);
-        return response.Items; // Return the array of pending tickets
+        const pendingTickets = await ticketsDAO.getPendingTickets();
+        return pendingTickets; // Return the retrieved tickets
     } catch (error) {
-        console.error("Error fetching pending tickets:", error);
-        throw error; // Rethrow error for handling in the controller
+        console.error("Error in service layer fetching pending tickets:", error);
+        throw new Error('Could not fetch pending tickets'); // Propagate error
     }
 }
 
 
 async function updateTicketStatus(ticketID, status) {
-    // Validate status
-    if (!['Approved', 'Denied'].includes(status)) {
-        throw new Error('Invalid status');
-    }
-
-    const command = new UpdateCommand({
-        TableName: 'Tickets',
-        Key: { ticketID },
-        UpdateExpression: "SET #status = :status",
-        ConditionExpression: "#status = :pending", // Ensure it's pending before updating
-        ExpressionAttributeNames: {
-            "#status": "status"
-        },
-        ExpressionAttributeValues: {
-            ":pending": "Pending",
-            ":status": status
-        }
-    });
-
     try {
-        await documentClient.send(command);
-        return { success: true, message: `Ticket ${ticketID} has been ${status}.` };
+        const result = await ticketsDAO.updateTicketStatus(ticketID, status);
+        console.log(result);
+        return result; // Return the result from the DAO
     } catch (error) {
-        console.error("Error updating ticket status:", error);
-        throw error; // Rethrow error for handling in the controller
+        console.error("Error in service layer updating ticket status:", error);
+        throw new Error('Could not update ticket status'); 
     }
 }
 module.exports = {

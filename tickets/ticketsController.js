@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ticketsService = require('./ticketsDAO');
+const ticketService = require('./ticketService');
 
 // route handler for GET requests
 router.get('/', async (req, res) => {
@@ -12,10 +12,10 @@ router.get('/', async (req, res) => {
 
         // if ticketIdQuery is requested, return that ticket
         if (ticketIdQuery) {
-            const ticket = await ticketsService.getTicket(ticketIdQuery);
+            const ticket = await ticketService.getTicket(ticketIdQuery);
             res.send(ticket);
         } else { // if no ticket is specified, return all tickets
-            const tickets = await ticketsService.getAllTickets();
+            const tickets = await ticketService.getAllTickets();
             res.send(tickets);
         }
     } catch (error) {
@@ -34,7 +34,7 @@ router.post('/tickets', async (req, res) => {
     }
 
     try {
-        const ticket = await ticketsService.createTicket(employeeEmail, amount, description);
+        const ticket = await ticketService.createTicket(employeeEmail, amount, description);
         res.status(201).send(ticket);
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -42,11 +42,11 @@ router.post('/tickets', async (req, res) => {
 });
 
 // get all tickets for an employee
-router.get('/tickets/employeeTickets', async (req, res) => {
+router.get('/employeeTickets', async (req, res) => {
     const employeeEmail = req.session.user.email;
 
     try {
-        const tickets = await ticketsService.getEmployeeTickets(employeeEmail);
+        const tickets = await ticketService.getEmployeeTickets(employeeEmail);
         res.status(200).send(tickets);
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -54,9 +54,9 @@ router.get('/tickets/employeeTickets', async (req, res) => {
 });
 
 // get pending tickets
-router.get('/tickets/pending', async (req, res) => {
+router.get('/pending', async (req, res) => {
     try {
-        const tickets = await ticketsService.getPendingTickets();
+        const tickets = await ticketService.getPendingTickets();
         res.status(200).send(tickets);
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -69,7 +69,7 @@ router.patch('/tickets/:ticketID', async (req, res) => {
     const ticketID = req.params.ticketID;
 
     try {
-        const updatedTicket = await ticketsService.updateTicketStatus(ticketID, status);
+        const updatedTicket = await ticketService.updateTicketStatus(ticketID, status);
         res.status(200).send(updatedTicket);
     } catch (error) {
         res.status(500).send({ message: error.message });
