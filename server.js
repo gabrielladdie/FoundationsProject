@@ -5,6 +5,13 @@ const employeeRouter = require('./employee/employeeController'); // Make sure yo
 const logger = require('./logger');
 const session = require('express-session');
 
+//connection testing
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, ScanCommand} = require("@aws-sdk/lib-dynamodb");
+const client = new DynamoDBClient({ region: 'us-east-1' });
+const documentClient = DynamoDBDocumentClient.from(client);
+const TABLE_TICKETS = 'Tickets';
+
 const port =  3000; // Use environment variable for port
 
 app.use(express.json()); // Tells the app to understand JSON data in requests
@@ -37,7 +44,19 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Internal Server Error' });
 });
 
+// Connection testing function
+async function testConnection() {
+    const command = new ScanCommand({ TableName: TABLE_TICKETS });
+    try {
+        const response = await documentClient.send(command);
+        console.log("Connection successful:", response);
+    } catch (error) {
+        console.error("Connection error:", error);
+    }
+}
+
 // Start the server
-app.listen(port, () => {
+app.listen(port, async() => {
     console.log(`Listening on port ${port}`);
+    await testConnection();
 });
