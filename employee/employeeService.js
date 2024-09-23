@@ -55,10 +55,34 @@ function validateUser(user) {
     };
 }
 
+async function loginUser(email, password) {
+    try {
+        // Fetch the user details from the database
+        const employee = await employeeDAO.getEmployee(email);
+        
+        if (!employee) {
+            return { success: false, message: "User not found" };
+        }
+
+        // Compare the provided password with the hashed password
+        const isPasswordValid = await bcrypt.compare(password, employee.password);
+        
+        if (!isPasswordValid) {
+            return { success: false, message: "Invalid password" };
+        }
+
+        return { success: true, message: "Login successful" };
+    } catch (error) {
+        console.error("Error during login:", error);
+        return { success: false, message: "Login failed" };
+    }
+}
+
 module.exports = {
     viewAllTickets,
     updateTicket,
     filterByStatus,
     registerUser,
     validateUser,
+    loginUser
 };

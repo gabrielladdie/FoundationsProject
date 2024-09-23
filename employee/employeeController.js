@@ -21,5 +21,16 @@ router.post("/register", async (req, res) => {
 });
 
 
+// Route to handle user login
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
+
+    const result = await employeeService.loginUser(email, password);
+    if (result.success) {
+        res.status(200).json({ message: result.message });
+    } else {
+        res.status(400).json({ message: result.message });
+    }
+});
 
 module.exports = router;

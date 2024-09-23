@@ -107,7 +107,8 @@ async function postUser(employee) {
     });
 
     try {
-        await documentClient.send(command);
+        const response = await documentClient.send(command);
+        return response.Attributes;  // Return the updated attributes or the item if it already existed (for updating)  // Return updated attributes
     } catch (error) {
         console.error("Error creating employee:", error);
         throw error;
