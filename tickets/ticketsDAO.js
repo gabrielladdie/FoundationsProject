@@ -32,12 +32,13 @@ async function createTicket(ticket){
     try {
         const response = await documentClient.send(command);
         console.log(response);
+        return  response;
     } catch (error) {
         console.log(error);
     }
 }
 
-async function getTicketByID(ID){
+async function getTicketByID(ticketID){
     const command = new QueryCommand({
         TableName,
         KeyConditionExpression: "#ID = :ticketID",
@@ -45,7 +46,7 @@ async function getTicketByID(ID){
             "#ID": "ticketID"
         },
         ExpressionAttributeValues: {
-            ":ticketID": ID
+            ":ticketID": ticketID
         }
     });
     try {

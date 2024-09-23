@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ticketsService = require('./ticketsService');
+const ticketsService = require('./ticketsDAO');
 
 // route handler for GET requests
 router.get('/', async (req, res) => {
@@ -27,10 +27,17 @@ router.get('/', async (req, res) => {
 router.get('/:ticketID', async (req, res) => {
     // extracts the value of the ticketID parameter from the URL
     const ticketID = req.params.ticketID;
-    const ticket = await ticketsService.getTicketByID(ticketID);
-
-    // response is the retrieved ticket
-    res.send(ticket);
+    try {
+        const ticket = await ticketsService.getTicketByID(ticketID);
+        if (ticket) {
+            return res.send(ticket); // Send the found ticket
+        } else {
+            return res.status(404).send({ message: "Ticket not found" }); // Ticket not found
+        }
+    } catch (error) {
+        console.error("Error fetching ticket:", error);
+        return res.status(500).send({ message: error.message }); // Handle errors
+    }
 });
 
 // route handler for POST requests
