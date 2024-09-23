@@ -17,6 +17,7 @@ async function getAllTickets(){
     try {
         const response = await documentClient.send(command);
         console.log(response);
+        return response.Items;
     } catch (error) {
         console.log(error);
     }
@@ -26,7 +27,7 @@ async function getAllTickets(){
 async function createTicket(ticket){
     const command = new PutCommand({
         TableName,
-        ticket
+        Item: ticket
     });
     try {
         const response = await documentClient.send(command);
@@ -44,7 +45,7 @@ async function getTicketByID(ID){
             "#ID": "ticketID"
         },
         ExpressionAttributeValues: {
-            ":ticketID": "ID"
+            ":ticketID": ID
         }
     });
     try {

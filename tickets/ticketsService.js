@@ -20,7 +20,7 @@ async function getTicketByID(ID) {
     return ticket;
 }
 
-module.export = {
+module.exports = {
     getAllTickets,
     createTicket,
     getTicketByID

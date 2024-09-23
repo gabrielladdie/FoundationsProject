@@ -8,6 +8,14 @@ const port =  3000; // Use environment variable for port
 
 app.use(express.json()); // Tells the app to understand JSON data in requests
 
+// Set up session middleware
+app.use(session({
+    secret: 'mySecretKeyThatNoOneCanGuess', // Replace with a strong secret
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Set secure to true if using HTTPS
+}));
+
 // Middleware setup to log information about each request
 app.use((req, res, next) => {
     logger.info(`${req.method}: ${req.url} request received`); // Logs method and URL of each request

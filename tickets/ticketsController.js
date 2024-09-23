@@ -5,17 +5,21 @@ const ticketsService = require('./ticketsService');
 
 // route handler for GET requests
 router.get('/', async (req, res) => {
-    // get information from a URL query
-    // req.query checks for any query parameters
-    const ticketIdQuery = req.query.ticketID;
+    try {
+        // get information from a URL query
+        // req.query checks for any query parameters
+        const ticketIdQuery = req.query.ticketID;
 
-    // if ticketIdQuery is requested, return that ticket
-    if(ticketIdQuery){
-        const ticket = await ticketsService.getTicket(ticketIdQuery);
-        res.send(ticket);
-    } else { // if no ticket is specified, return all tickets
-        const tickets = await ticketsService.getAllTickets();
-        res.send(tickets);
+        // if ticketIdQuery is requested, return that ticket
+        if (ticketIdQuery) {
+            const ticket = await ticketsService.getTicket(ticketIdQuery);
+            res.send(ticket);
+        } else { // if no ticket is specified, return all tickets
+            const tickets = await ticketsService.getAllTickets();
+            res.send(tickets);
+        }
+    } catch (error) {
+        res.status(500).send({ message: error.message }); // Handle errors
     }
 });
 
@@ -31,10 +35,14 @@ router.get('/:ticketID', async (req, res) => {
 
 // route handler for POST requests
 router.post('/', async (req, res) => {
-    // extracts the data sent in the request body
-    const ticket = req.body;
-    const newTicket = await ticketsService.createTicket(ticket);
-    res.status(201).send(newTicket);
+    try {
+        // get information from the request body
+        const ticket = req.body;
+        const newTicket = await ticketsService.createTicket(ticket);
+        res.status(201).send(newTicket);
+    } catch (error) {
+        res.status(500).send({ message: error.message }); // Handle errors
+    }
 });
 
 module.exports = router;
