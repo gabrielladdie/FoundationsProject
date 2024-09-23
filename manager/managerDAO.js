@@ -5,8 +5,8 @@ const {DynamoDBDocumentClient,
     } = require("@aws-sdk/lib-dynamodb");
 
 const client = new DynamoDBClient({region: 'us-east-1'});
-const documentClient = DynamoDBClient.from(client);
-const TableName = 'Manager';
+const documentClient = DynamoDBDocumentClient.from(client);
+const TableName = 'Tickets';
 
 
 // get tickets for employee
