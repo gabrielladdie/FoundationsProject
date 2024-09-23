@@ -1,10 +1,9 @@
 const {DynamoDBClient} = require("@aws-sdk/client-dynamodb");
 const {DynamoDBDocumentClient, 
     ScanCommand,
-    PutCommand
+    PutCommand,
+    QueryCommand
     } = require("@aws-sdk/lib-dynamodb");
-import { GetCommand } from '@aws-sdk/lib-dynamodb';
-
 const client = new DynamoDBClient({region: 'us-east-1'});
 const documentClient = DynamoDBDocumentClient.from(client);
 const TableName = 'Tickets';

@@ -3,17 +3,21 @@ const uuid = require('uuid');
 
 async function getAllTickets() {
     const tickets = await ticketsDAO.getAllTickets();
+    return tickets;
 }
 
 async function createTicket(ticket) {
-    const ticket = await ticketsDAO.createTicket({
+    const tickets = await ticketsDAO.createTicket({
         ...ticket,
         ticketID: uuid.v4()
     });
+    return tickets;
 }
+
 
 async function getTicketByID(ID) {
     const ticket = await ticketsDAO.getTicketByID(ID);
+    return ticket;
 }
 
 module.export = {
