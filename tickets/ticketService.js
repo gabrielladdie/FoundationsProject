@@ -18,14 +18,14 @@ async function createTicket(ticket) {
             employeeEmail: ticket.employeeEmail,
             amount: ticket.amount,
             description: ticket.description,
-            status: ticket.status,
+            status: ticket.status || 'Pending', // Default status to 'Pending'
             createdAt: new Date().toISOString()
         };
         const result = await ticketsDAO.createTicket(newTicket);
         return result; // Return the created ticket or response
     } catch (error) {
         console.error("Error creating ticket:", error);
-        throw new Error('Could not create ticket'); // Propagate error
+        throw new Error('Could not create ticket');
     }
 }
 
@@ -38,7 +38,7 @@ async function getTicketByID(ID) {
         return ticket; // Return the found ticket
     } catch (error) {
         console.error("Error fetching ticket by ID:", error);
-        throw new Error('Could not retrieve ticket'); // Propagate error
+        throw new Error('Could not retrieve ticket');
     }
 }
 
