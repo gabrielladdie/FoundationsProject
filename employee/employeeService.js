@@ -1,4 +1,6 @@
-const employeeDAO = require('./employeeDAO'); // Add this import
+const employeeDAO = require('./employeeDAO');
+const bcrypt = require('bcrypt');
+const uuid = require('uuid');
 
 async function viewAllTickets() {
     try {
@@ -30,8 +32,13 @@ async function filterByStatus(status) {
 async function registerUser(user) {
     const validation = validateUser(user);
     if (validation.isValid) {
+        const hashedPassword = await bcrypt.hash(user.password, 10);
         try {
-            await employeeDAO.postUser({ ...user });
+            await employeeDAO.postUser({
+                ...user,
+                password: hashedPassword,
+                employeeID: uuid.v4()
+            });
             return { success: true };
         } catch (error) {
             console.error("Error posting user:", error);
@@ -42,40 +49,46 @@ async function registerUser(user) {
     }
 }
 
-function validateUser(user) {
-    const errors = [];
-
-    if (!user.username) errors.push("Username is required");
-    if (!user.password) errors.push("Password is required");
-    // Add more validation as needed (e.g., email format, password strength)
-
-    return {
-        isValid: errors.length === 0,
-        errors
-    };
-}
-
 async function loginUser(email, password) {
     try {
         // Fetch the user details from the database
         const employee = await employeeDAO.getEmployee(email);
-        
+
         if (!employee) {
             return { success: false, message: "User not found" };
         }
 
         // Compare the provided password with the hashed password
         const isPasswordValid = await bcrypt.compare(password, employee.password);
-        
+
         if (!isPasswordValid) {
             return { success: false, message: "Invalid password" };
         }
 
+        // Store user info in session
+        session.user = {
+            email: employee.email,
+            employeeID: employee.employeeID
+        };
+
         return { success: true, message: "Login successful" };
+
     } catch (error) {
         console.error("Error during login:", error);
         return { success: false, message: "Login failed" };
     }
+}
+
+function validateUser(user) {
+    const errors = [];
+
+    if (!user.username) errors.push("Username is required");
+    if (!user.password) errors.push("Password is required");
+
+    return {
+        isValid: errors.length === 0,
+        errors
+    };
 }
 
 module.exports = {

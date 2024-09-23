@@ -3,6 +3,7 @@ const app = express(); // Creates express application
 const ticketRouter = require('./tickets/ticketsController'); 
 const employeeRouter = require('./employee/employeeController'); // Make sure you have a separate controller for employees
 const logger = require('./logger');
+const session = require('express-session');
 
 const port =  3000; // Use environment variable for port
 
@@ -10,10 +11,13 @@ app.use(express.json()); // Tells the app to understand JSON data in requests
 
 // Set up session middleware
 app.use(session({
-    secret: 'mySecretKeyThatNoOneCanGuess', // Replace with a strong secret
+    secret: 'mySecretKeyThatNoOneCanGuess', 
     resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } // Set secure to true if using HTTPS
+    saveUninitialized: true,
+    cookie: { 
+        secure: false, // Set secure to true if using HTTPS
+        maxAge: 3600000 // 1 hour in milliseconds
+    }
 }));
 
 // Middleware setup to log information about each request
