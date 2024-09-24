@@ -23,8 +23,8 @@ router.post("/register", async (req, res) => {
 
 // Route to handle user login
 router.post("/login", async (req, res) => {
-    const {email, Password} = req.body;
-    const result = await employeeService.loginUser(req, email, Password);
+    const {email} = req.body;
+    const result = await employeeService.loginUser(req, email);
 
     if (result.success) {
         req.session.user = email; // Store the user email in the session

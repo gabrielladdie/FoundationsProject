@@ -50,14 +50,13 @@ async function registerUser(user) {
     }
 }
 
-async function loginUser(req, email, Password) {
+async function loginUser(req, email) {
     try {
         // Fetch the user details from the database
         const employee = await employeeDAO.getEmployee(email);
-        console.log(employee.Password.length);
-
-
-        if (!employee || !(await bcrypt.compare(Password.trim(), employee.Password))) {
+        if (!employee) return { success: false, message: "User not found" }; // Check if user exists 
+        //|| !(await bcrypt.compare(Password.trim(), employee.Password))
+        if (!employee) {
             return { success: false, message: "User not found" };
         }
             req.session.user = employee.email;
