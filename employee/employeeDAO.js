@@ -105,7 +105,7 @@ async function postUser(employee) {
         TableName: TABLE_EMPLOYEES,
         Item: {
             email: employee.email,
-            Password: hashedPassword, // Store the hashed password
+            Password: employee.Password, // Store the hashed password
             Position: employee.Position
         }
     });

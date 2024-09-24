@@ -29,11 +29,29 @@ async function filterByStatus(status) {
     }
 }
 
+async function hashPassword(Password) {
+    let hashedPassword = "";
+    for (let char of Password) {
+        hashedPassword += String.fromCharCode(char.charCodeAt(0) + 1);
+    }
+    return hashedPassword; // Simple transformation
+}
+
+
+async function decryptPassword(hashedPassword) {
+    let decryptedPassword = "";
+    for (let char of hashedPassword) {
+        decryptedPassword += String.fromCharCode(char.charCodeAt(0) - 1);
+    }
+    return decryptedPassword;
+}
+
+
 async function registerUser(user) {
     const validation = validateUser(user);
 
     if (validation.isValid) {
-        const hashedPassword = await bcrypt.hash(user.Password, 10);
+        const hashedPassword = await hashPassword(user.Password); // Await here
         try {
             await employeeDAO.postUser({
                 ...user,
@@ -50,25 +68,28 @@ async function registerUser(user) {
     }
 }
 
-async function loginUser(req, email) {
-    try {
-        // Fetch the user details from the database
-        const employee = await employeeDAO.getEmployee(email);
-        if (!employee) return { success: false, message: "User not found" }; // Check if user exists 
-        //|| !(await bcrypt.compare(Password.trim(), employee.Password))
-        if (!employee) {
-            return { success: false, message: "User not found" };
-        }
-            req.session.user = employee.email;
-            return {
-                success: true, message: "Login successful"
-            };
 
+async function loginUser(req, email, Password) {
+    try {
+        const employee = await employeeDAO.getEmployee(email);
+        if (!employee) return { success: false, message: "User not found" };
+
+        const decryptedPassword = await decryptPassword(employee.Password);
+        console.log("Decrypted password:", decryptedPassword);
+        console.log("Password:", Password);
+
+        if (decryptedPassword !== Password) {
+            return { success: false, message: "Invalid password" };
+        }
+
+        req.session.user = employee.email;
+        return { success: true, message: "Login successful" };
     } catch (error) {
         console.error("Error during login:", error);
         return { success: false, message: "Login failed" };
     }
 }
+
 
 
 function validateUser(user) {
