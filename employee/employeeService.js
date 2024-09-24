@@ -54,10 +54,7 @@ async function loginUser(req, email, Password) {
     try {
         // Fetch the user details from the database
         const employee = await employeeDAO.getEmployee(email);
-        console.log(email, Password);
-        console.log(employee);
-        console.log(await bcrypt.compareSync(Password.trim(), employee.Password))
-        console.log(employee.Password);
+        console.log(employee.Password.length);
 
 
         if (!employee || !(await bcrypt.compare(Password.trim(), employee.Password))) {

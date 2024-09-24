@@ -98,6 +98,7 @@ async function postTicket(item) {
 // Post a new user
 async function postUser(employee) {
     const hashedPassword = await bcrypt.hash(employee.Password, 10); // Hash the password
+    console.log(hashedPassword.length);
     const command = new PutCommand({
         TableName: TABLE_EMPLOYEES,
         Item: {
