@@ -27,6 +27,8 @@ router.post("/login", async (req, res) => {
     const result = await employeeService.loginUser(req, email, Password);
 
     if (result.success) {
+        req.session.user = email; // Store the user email in the session
+        console.log("Session after login:", req.session); // Log session object
         res.status(200).json({ message: result.message });
     } else {
         res.status(400).json({ message: result.message });

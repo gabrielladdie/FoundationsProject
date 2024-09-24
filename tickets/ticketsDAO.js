@@ -8,7 +8,6 @@ const client = new DynamoDBClient({region: 'us-east-1'});
 const documentClient = DynamoDBDocumentClient.from(client);
 const TableName = 'Tickets';
 
-
 // get tickets for employee
 async function getAllTickets(){
     const command = new ScanCommand({

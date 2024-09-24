@@ -56,10 +56,11 @@ async function loginUser(req, email, Password) {
         const employee = await employeeDAO.getEmployee(email);
         console.log(email, Password);
         console.log(employee);
-        console.log(await bcrypt.compare(Password, employee.Password))
+        console.log(await bcrypt.compareSync(Password.trim(), employee.Password))
+        console.log(employee.Password);
 
 
-        if (!employee || !(await bcrypt.compare(Password, employee.Password))) {
+        if (!employee || !(await bcrypt.compare(Password.trim(), employee.Password))) {
             return { success: false, message: "User not found" };
         }
             req.session.user = employee.email;

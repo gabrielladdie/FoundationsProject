@@ -52,7 +52,6 @@ async function getPendingTickets() {
     }
 }
 
-
 async function updateTicketStatus(ticketID, status) {
     try {
         const result = await ticketsDAO.updateTicketStatus(ticketID, status);
