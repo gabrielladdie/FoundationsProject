@@ -18,7 +18,8 @@ async function getAllTickets(){
         console.log(response);
         return response.Items;
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching tickets:", error);
+        throw error; // Rethrow error for handling in the service
     }
 }
 

@@ -1,60 +1,60 @@
 const express = require('express');
 const router = express.Router();
-
 const ticketService = require('./ticketService');
 
-// route handler for GET requests
+// Get all tickets or a specific ticket
 router.get('/', async (req, res) => {
     try {
-        // get information from a URL query
-        // req.query checks for any query parameters
         const ticketIdQuery = req.query.ticketID;
+        const userRole = req.session.user.role;
 
-        // if ticketIdQuery is requested, return that ticket
         if (ticketIdQuery) {
-            const ticket = await ticketService.getTicket(ticketIdQuery);
-            res.send(ticket);
-        } else { // if no ticket is specified, return all tickets
-            const tickets = await ticketService.getAllTickets();
-            res.send(tickets);
+            const ticket = await ticketService.getTicketByID(ticketIdQuery);
+            return res.send(ticket);
+        } else {
+            // Only managers can view all tickets
+            if (userRole === 'Manager') {
+                const tickets = await ticketService.getAllEmployeeTickets();
+                return res.send(tickets);
+            } else {
+                const email = req.session.user.email;
+                const tickets = await ticketService.getAllEmployeeTickets(email);
+                return res.send(tickets);
+            }
         }
     } catch (error) {
-        res.status(500).send({ message: error.message }); // Handle errors
+        res.status(500).send({ message: error.message });
     }
 });
 
-
-// route handler for POST requests
+// Create new ticket
 router.post('/tickets', async (req, res) => {
     const { amount, description } = req.body;
-    const employeeEmail = req.session.user.email; // Assuming email is stored in session
+
+    // Check if the user is authenticated and has an email in the session
+    if (!req.session.user || !req.session.user.email) {
+        return res.status(401).send({ message: 'User not authenticated' });
+    }
+
+    const employeeEmail = req.session.user.email; // Get email from session
 
     if (!amount || !description) {
         return res.status(400).send({ message: 'Amount and description are required.' });
     }
 
     try {
-        const ticket = await ticketService.createTicket(employeeEmail, amount, description);
+        const ticket = await ticketService.createTicket({ employeeEmail, amount, description });
         res.status(201).send(ticket);
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
 });
 
-// get all tickets for an employee
-router.get('/employeeTickets', async (req, res) => {
-    const employeeEmail = req.session.user.email;
-
-    try {
-        const tickets = await ticketService.getEmployeeTickets(employeeEmail);
-        res.status(200).send(tickets);
-    } catch (error) {
-        res.status(500).send({ message: error.message });
-    }
-});
-
-// get pending tickets
+// Get pending tickets (only for managers)
 router.get('/pending', async (req, res) => {
+    if (req.session.user.role !== 'Manager') {
+        return res.status(403).send({ message: 'Access denied' });
+    }
     try {
         const tickets = await ticketService.getPendingTickets();
         res.status(200).send(tickets);
@@ -65,8 +65,12 @@ router.get('/pending', async (req, res) => {
 
 // Approve or Deny a ticket
 router.patch('/tickets/:ticketID', async (req, res) => {
-    const { status } = req.body; // status should be 'Approved' or 'Denied'
+    const { status } = req.body;
     const ticketID = req.params.ticketID;
+
+    if (req.session.user.role !== 'Manager') {
+        return res.status(403).send({ message: 'Access denied' });
+    }
 
     try {
         const updatedTicket = await ticketService.updateTicketStatus(ticketID, status);
@@ -75,4 +79,5 @@ router.patch('/tickets/:ticketID', async (req, res) => {
         res.status(500).send({ message: error.message });
     }
 });
+
 module.exports = router;

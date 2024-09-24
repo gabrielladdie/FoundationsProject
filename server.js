@@ -1,22 +1,11 @@
 const express = require('express');
-const app = express(); // Creates express application
+const app = express();
 const ticketRouter = require('./tickets/ticketsController');
-const employeeRouter = require('./employee/employeeController'); // Make sure you have a separate controller for employees
+const employeeRouter = require('./employee/employeeController');
 const logger = require('./logger');
 const session = require('express-session');
 
-//connection testing
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, ScanCommand } = require("@aws-sdk/lib-dynamodb");
-const client = new DynamoDBClient({ region: 'us-east-1' });
-const documentClient = DynamoDBDocumentClient.from(client);
-const TABLE_TICKETS = 'Tickets';
-
-//hash testing
-const bcrypt = require('bcrypt');
-
 const port = 3000; // Use environment variable for port
-
 app.use(express.json()); // Tells the app to understand JSON data in requests
 
 // Set up session middleware
@@ -30,16 +19,44 @@ app.use(session({
     }
 }));
 
+// Example login route
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    // Assume you have a function to verify user credentials
+    const user = await authenticateUser(email, password); // Implement this function
+
+    if (user) {
+        // Set user information in session
+        req.session.user = {
+            email: user.email,
+            role: user.role // Store role in session
+        };
+        res.status(200).send({ message: 'Login successful' });
+    } else {
+        res.status(401).send({ message: 'Invalid credentials' });
+    }
+});
+
+// Check session route
+app.get('/session', (req, res) => {
+    if (req.session.user) {
+        res.status(200).send(req.session.user);
+    } else {
+        res.status(401).send({ message: 'Not authenticated' });
+    }
+});
+
+
 // Middleware setup to log information about each request
 app.use((req, res, next) => {
-    logger.info(`${req.method}: ${req.url} request received`); // Logs method and URL of each request
-    next(); // Pass control to the next middleware
+    logger.info(`${req.method}: ${req.url} request received`);
+    next();
 });
 
 // Define routes
 app.use('/employees', employeeRouter);
-app.use('/tickets', ticketRouter); // Use router for paths starting with /tickets
-
+app.use('/tickets', ticketRouter);
 
 // Centralized error handling middleware
 app.use((err, req, res, next) => {
@@ -47,32 +64,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Internal Server Error' });
 });
 
-// Connection testing function
-// async function testConnection() {
-//     const command = new ScanCommand({ TableName: TABLE_TICKETS });
-//     try {
-//         const response = await documentClient.send(command);
-//         console.log("Connection successful:", response);
-//     } catch (error) {
-//         console.error("Connection error:", error);
-//     }
-// }
-
-
-// async function testBcrypt() {
-//     const password = 'password'; // Use a test password
-//     const hashedPassword = await bcrypt.hash(password, 10);
-
-//     console.log('Hashed Password:', hashedPassword); // Log the hashed password
-
-//     const match = await bcrypt.compare(password, hashedPassword);
-//     console.log('Password match:', match); // Should log true
-// }
-
-
 // Start the server
-app.listen(port, async () => {
+app.listen(port, () => {
     console.log(`Listening on port ${port}`);
-    // await testConnection();
-    // testBcrypt();
 });

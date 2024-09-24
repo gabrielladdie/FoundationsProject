@@ -11,15 +11,16 @@ async function getAllEmployeeTickets() {
     }
 }
 
+
 async function createTicket(ticket) {
     try {
         const newTicket = {
             ticketID: uuidv4(),
-            employeeEmail: ticket.employeeEmail,
+            email: ticket.email,
             amount: ticket.amount,
             description: ticket.description,
             status: ticket.status || 'Pending', // Default status to 'Pending'
-            createdAt: new Date().toISOString()
+            dateCreated: new Date().toISOString()
         };
         const result = await ticketsDAO.createTicket(newTicket);
         return result; // Return the created ticket or response
