@@ -29,7 +29,7 @@ app.post('/login', async (req, res) => {
         // Set user information in session
         req.session.user = {
             email: user.email,
-            role: user.role // Store role in session
+            Position: user.Position // Store Position in session
         };
         res.status(200).send({ message: 'Login successful' });
     } else {

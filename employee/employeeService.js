@@ -83,7 +83,7 @@ async function filterByStatus(status) {
         
         async function loginUser(req, email, password) {
             try {
-                const employee = await employeeDAO.getEmployee(email);
+                const employee = await employeeDAO.getEmployee(email, req.session.user.Password);
                 if (!employee) return { success: false, message: "User not found" };
         
                 const isMatch = await bcrypt.compare(password, employee.Password);

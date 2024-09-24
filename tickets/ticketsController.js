@@ -6,14 +6,14 @@ const ticketService = require('./ticketService');
 router.get('/', async (req, res) => {
     try {
         const ticketIdQuery = req.query.ticketID;
-        const userRole = req.session.user.role;
+        const userPosition = req.session.user.Position;
 
         if (ticketIdQuery) {
             const ticket = await ticketService.getTicketByID(ticketIdQuery);
             return res.send(ticket);
         } else {
             // Only managers can view all tickets
-            if (userRole === 'Manager') {
+            if (userPosition === 'Manager') {
                 const tickets = await ticketService.getAllEmployeeTickets();
                 return res.send(tickets);
             } else {
@@ -32,7 +32,7 @@ router.post('/newTicket', async (req, res) => {
     const { amount, description } = req.body;
 
     // // Check if the user is authenticated and has an email in the session
-    if (!req.session?.user?.email) {
+    if (!req.session?.user) {
         console.log(req.session.user);
         return res.status(401).send({ message: 'User not authenticated' });
     }
@@ -44,6 +44,7 @@ router.post('/newTicket', async (req, res) => {
     }
 
     try {
+        console.log(amount, description, employeeEmail);
         const ticket = await ticketService.createTicket({ amount, description, employeeEmail });
         res.status(201).send(ticket);
     } catch (error) {
@@ -53,7 +54,8 @@ router.post('/newTicket', async (req, res) => {
 
 // Get pending tickets (only for managers)
 router.get('/pending', async (req, res) => {
-    if (req.session.user.role !== 'Manager') {
+    console.log(req.session.user.Position);
+    if (req.session.user.Position !== 'Manager') {
         return res.status(403).send({ message: 'Access denied' });
     }
     try {
@@ -69,7 +71,7 @@ router.patch('/tickets/:ticketID', async (req, res) => {
     const { status } = req.body;
     const ticketID = req.params.ticketID;
 
-    if (req.session.user.role !== 'Manager') {
+    if (req.session.user.Position !== 'Manager') {
         return res.status(403).send({ message: 'Access denied' });
     }
 

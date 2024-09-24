@@ -1,5 +1,6 @@
 const ticketsDAO = require('./ticketsDAO');
-const { v4: uuidv4 } = require('uuid'); // Import uuid correctly
+const { v4: uuidv4 } = require('uuid'); 
+
 
 async function getAllEmployeeTickets() {
     try {
@@ -15,14 +16,16 @@ async function getAllEmployeeTickets() {
 async function createTicket(req) {
     try {
         // Extract amount and description from the request body
-        const { amount, description } = req.body;
+        const { amount, description } = req;
 
         // Get email from session
-        const employeeEmail = req.session.user;
+        const employeeEmail = req.employeeEmail;
         const result = await ticketsDAO.createTicket({
             ticketID: uuidv4(),
             amount: amount,
+            dateCreated: new Date().toISOString(),
             description: description,
+            status: 'Pending', // Default status to 'Pending'
             email: employeeEmail
         });
         return result; // Return the created ticket or response

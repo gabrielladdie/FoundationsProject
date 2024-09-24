@@ -59,13 +59,13 @@ async function getTicketByID(ticketID){
 
 async function getPendingTickets() {
     const command = new QueryCommand({
-        TableName: 'Tickets', // Ensure you have a GSI for status if needed
-        KeyConditionExpression: "#status = :pending",
+        TableName: 'Tickets', 
+        KeyConditionExpression: "#status = :Pending",
         ExpressionAttributeNames: {
             "#status": "status"
         },
         ExpressionAttributeValues: {
-            ":pending": "Pending"
+            ":Pending": "Pending"
         }
     });
 
