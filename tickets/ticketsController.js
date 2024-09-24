@@ -28,22 +28,23 @@ router.get('/', async (req, res) => {
 });
 
 // Create new ticket
-router.post('/tickets', async (req, res) => {
+router.post('/newTicket', async (req, res) => {
     const { amount, description } = req.body;
 
-    // Check if the user is authenticated and has an email in the session
-    if (!req.session.user || !req.session.user.email) {
+    // // Check if the user is authenticated and has an email in the session
+    if (!req.session?.user?.email) {
+        console.log(req.session.user);
         return res.status(401).send({ message: 'User not authenticated' });
     }
 
-    const employeeEmail = req.session.user.email; // Get email from session
+    const employeeEmail = req.session.user; // Get email from session
 
     if (!amount || !description) {
         return res.status(400).send({ message: 'Amount and description are required.' });
     }
 
     try {
-        const ticket = await ticketService.createTicket({ employeeEmail, amount, description });
+        const ticket = await ticketService.createTicket({ amount, description, employeeEmail });
         res.status(201).send(ticket);
     } catch (error) {
         res.status(500).send({ message: error.message });

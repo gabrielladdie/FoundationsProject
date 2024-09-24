@@ -169,8 +169,6 @@ async function loginUser(req, email, Password) {
         if (!employee) return { success: false, message: "User not found" };
 
         const decryptedPassword = await decryptPassword(employee.Password);
-        console.log("Decrypted password:", decryptedPassword);
-        console.log("Password:", Password);
 
         if (decryptedPassword !== Password) {
             return { success: false, message: "Invalid password" };

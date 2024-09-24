@@ -12,23 +12,26 @@ async function getAllEmployeeTickets() {
 }
 
 
-async function createTicket(ticket) {
+async function createTicket(req) {
     try {
-        const newTicket = {
+        // Extract amount and description from the request body
+        const { amount, description } = req.body;
+
+        // Get email from session
+        const employeeEmail = req.session.user;
+        const result = await ticketsDAO.createTicket({
             ticketID: uuidv4(),
-            email: ticket.email,
-            amount: ticket.amount,
-            description: ticket.description,
-            status: ticket.status || 'Pending', // Default status to 'Pending'
-            dateCreated: new Date().toISOString()
-        };
-        const result = await ticketsDAO.createTicket(newTicket);
+            amount: amount,
+            description: description,
+            email: employeeEmail
+        });
         return result; // Return the created ticket or response
     } catch (error) {
         console.error("Error creating ticket:", error);
         throw new Error('Could not create ticket');
     }
 }
+
 
 async function getTicketByID(ID) {
     try {

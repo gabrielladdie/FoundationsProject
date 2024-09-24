@@ -19,13 +19,12 @@ app.use(session({
     }
 }));
 
-// Example login route
+// login route
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Assume you have a function to verify user credentials
-    const user = await authenticateUser(email, password); // Implement this function
-
+    const user = await authenticateUser(email, password); 
     if (user) {
         // Set user information in session
         req.session.user = {
@@ -37,6 +36,8 @@ app.post('/login', async (req, res) => {
         res.status(401).send({ message: 'Invalid credentials' });
     }
 });
+
+
 
 // Check session route
 app.get('/session', (req, res) => {
