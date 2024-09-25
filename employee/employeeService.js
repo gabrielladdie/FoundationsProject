@@ -259,5 +259,6 @@ module.exports = {
     filterByStatus,
     registerUser,
     validateUser,
-    loginUser
+    loginUser,
+    decryptPassword
 };
