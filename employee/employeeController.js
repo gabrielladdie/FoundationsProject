@@ -6,21 +6,7 @@ const jwt = require('jsonwebtoken');
 const employeeService = require('./employeeService');
 const employeeDAO = require('./employeeDAO');
 
-// route to handle POST requests
-// router.post("/register", async (req, res) => {
-//     const user = req.body;
-//     const result = await employeeService.registerUser(user);
 
-//     if (result.success) {
-//         res.status(201).json({
-//             message: "User registered successfully"
-//         });
-//     } else {
-//         res.status(400).json({
-//             message: result.message
-//         });
-//     }
-// });
 // Route to handle POST requests for registration
 router.post("/register", async (req, res) => {
     const user = req.body;
@@ -49,7 +35,7 @@ router.post("/register", async (req, res) => {
 //     }
 // });
 
-async function authenticateUser(email, password) {
+async function authenticateUser(email, Password) {
     try {
         // Fetch the user from the database
         const user = await employeeDAO.getEmployee(email);
@@ -59,10 +45,9 @@ async function authenticateUser(email, password) {
             return { success: false, message: "User not found" };
         }
 
-        // Compare the provided password with the stored hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.Password);
+        const decryptedPassword = await employeeService.decryptPassword(Password);
 
-        if (!isPasswordValid) {
+        if (decryptedPassword !== Password) {
             return { success: false, message: "Invalid password" };
         }
 
