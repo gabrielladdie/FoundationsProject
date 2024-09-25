@@ -25,12 +25,15 @@ app.post('/login', async (req, res) => {
 
     // Assume you have a function to verify user credentials
     const user = await authenticateUser(email, password); 
+    console.log("inside login");
+    
     if (user) {
         // Set user information in session
         req.session.user = {
             email: user.email,
             Position: user.Position // Store Position in session
         };
+        console.log(req.session);
         res.status(200).send({ message: 'Login successful' });
     } else {
         res.status(401).send({ message: 'Invalid credentials' });

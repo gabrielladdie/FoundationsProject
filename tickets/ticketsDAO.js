@@ -60,12 +60,12 @@ async function getTicketByID(ticketID){
 async function getPendingTickets() {
     const command = new QueryCommand({
         TableName: 'Tickets', 
-        KeyConditionExpression: "#status = :Pending",
+        KeyConditionExpression: "#status = :status",
         ExpressionAttributeNames: {
             "#status": "status"
         },
         ExpressionAttributeValues: {
-            ":Pending": "Pending"
+            ":status": { S: "Pending" }
         }
     });
 
@@ -83,7 +83,6 @@ async function updateTicketStatus(ticketID, status) {
     if (!['Approved', 'Denied'].includes(status)) {
         throw new Error('Invalid status');
     }
-
     const command = new UpdateCommand({
         TableName: 'Tickets',
         Key: { ticketID },

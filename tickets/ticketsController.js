@@ -55,7 +55,8 @@ router.post('/newTicket', async (req, res) => {
 // Get pending tickets (only for managers)
 router.get('/pending', async (req, res) => {
     console.log(req.session.user.Position);
-    if (req.session.user.Position !== 'Manager') {
+    console.log(JSON.stringify(req.session.user.Position));
+    if (req.session.user.Position != 'Manager') {
         return res.status(403).send({ message: 'Access denied' });
     }
     try {
